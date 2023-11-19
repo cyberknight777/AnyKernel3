@@ -133,6 +133,13 @@ if [ -f $AKHOME/modules/dlkm.tar.xz ]; then
         abort "[✗] Failed to remove working directory"
     unset extract_vendor_dlkm_dir extract_vendor_dlkm_modules_dir
 
+    vendor_dlkm_block_size=$(blockdev --getsize64 /dev/block/mapper/vendor_dlkm${SLOT})
+    if [ $(wc -c < $AKHOME/vendor_dlkm.img) -lt ${vendor_dlkm_block_size} ]; then
+        ui_print "- [•] Generated /vendor_dlkm image size is smaller than the block device..."
+        ui_print "- [•] Truncating to fill the erofs image file..."
+        truncate -c -s $vendor_dlkm_block_size $AKHOME/vendor_dlkm.img
+    fi
+
     ui_print "- [✓] Flashing new /vendor_dlkm image..."
     flash_generic vendor_dlkm;
 fi
