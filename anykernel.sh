@@ -29,6 +29,9 @@ PATCH_VBMETA_FLAG=auto;
 # import functions/variables and setup patching - see for reference (DO NOT REMOVE)
 . tools/ak3-core.sh;
 
+$BOOTMODE || \
+abort "[✗] Use userspace kernel flashing applications to flash"
+
 # boot install
 split_boot; # use split_boot to skip ramdisk unpack, e.g. for devices with init_boot ramdisk
 
