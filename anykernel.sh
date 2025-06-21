@@ -66,10 +66,21 @@ if [ -f $AKHOME/modules/dlkm.cpio.lz4 ]; then
     ui_print "- [•] Updating vendor_ramdisk modules..."
     mv $AKHOME/dlkm.cpio $SPLITIMG/vendor_ramdisk/dlkm.cpio || \
         abort "[✗] Updating vendor_ramdisk modules failed"
-
-    ui_print "- [✓] Flashing new vendor_ramdisk image..."
 fi
 
+if [ -f $AKHOME/config/modules.load.recovery ]; then
+    ui_print " " "- [✓] Recovery modules.load found. Starting vendor_ramdisk recovery modules.load update..."
+
+    ui_print "- [•] Checking for modules.load.recovery in platform (default) ramdisk.cpio..."
+    magiskboot cpio $SPLITIMG/vendor_ramdisk/ramdisk.cpio "exists lib/modules/modules.load.recovery" || \
+        abort "[✗] Checking for modules.load.recovery in platform (default) ramdisk.cpio failed"
+
+    ui_print "- [•] Updating platform (default) ramdisk.cpio..."
+    magiskboot cpio $SPLITIMG/vendor_ramdisk/ramdisk.cpio "add 0644 lib/modules/modules.load.recovery $AKHOME/config/modules.load.recovery" || \
+        abort "[✗] Updating platform (default) ramdisk.cpio failed"
+fi
+
+ui_print "- [✓] Flashing new vendor_boot image..."
 flash_boot; # use flash_boot to skip ramdisk repack, e.g. for dtb on devices with hdr v4 but no vendor_kernel_boot
 ## end vendor_boot install
 
