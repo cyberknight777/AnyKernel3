@@ -123,7 +123,7 @@ if [ -f $AKHOME/modules/dlkm.tar.xz ]; then
           --mount-point /vendor_dlkm \
           --fs-config-file ${extract_vendor_dlkm_dir}/config/vendor_dlkm_fs_config \
           --file-contexts ${extract_vendor_dlkm_dir}/config/vendor_dlkm_file_contexts \
-          -z lz4hc,9 \
+          -z lz4 \
           -b 4096 \
           -C 262144 \
           -T 1230768000 \
