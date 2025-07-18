@@ -72,7 +72,8 @@ busybox: GPLv2
 
     Per Section 3(b), self-compiled binary from modified source:
     https://git.busybox.net/busybox/
-    https://github.com/osm0sis/android-busybox-ndk
+    https://github.com/topjohnwu/ndk-box-kitchen
+    https://github.com/topjohnwu/magisk-files/releases/download/files/busybox-1.36.1.1.zip
     (pre-patched source tree used to build available upon request)
 
 lptools_static: Apache License 2.0
@@ -94,8 +95,8 @@ snapshotupdater_static: Apache License 2.0
     limitations under the License.
 
     Source not required, however, respective sources are provided:
-    https://github.com/phhusson/vendor_lptools
-    https://android.googlesource.com/platform/system/extras/+/master/verity/fec/
+    https://github.com/capntrips/vendor_lptools
+    https://github.com/capntrips/vendor_fec
     https://github.com/capntrips/SnapshotUpdater
 
 httools_static: MIT License
