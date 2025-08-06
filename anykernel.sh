@@ -25,6 +25,7 @@ BLOCK=boot;
 IS_SLOT_DEVICE=1;
 RAMDISK_COMPRESSION=auto;
 PATCH_VBMETA_FLAG=auto;
+NO_MAGISK_CHECK=true;
 
 # import functions/variables and setup patching - see for reference (DO NOT REMOVE)
 . tools/ak3-core.sh;
