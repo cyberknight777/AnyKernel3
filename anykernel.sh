@@ -84,12 +84,11 @@ ui_print "- [✓] Flashing new vendor_boot image..."
 flash_boot; # use flash_boot to skip ramdisk repack, e.g. for dtb on devices with hdr v4 but no vendor_kernel_boot
 ## end vendor_boot install
 
-
-# reset for vendor_dlkm patching
-reset_ak;
-
 ## vendor_dlkm install
 if [ -f $AKHOME/modules/dlkm.tar.xz ]; then
+    # reset for vendor_dlkm patching
+    reset_ak;
+
     ui_print " " "/dev/block/mapper/vendor_dlkm${SLOT}"
     ui_print " " "- [✓] XZ tarball found. Starting /vendor_dlkm modules update..."
 
@@ -144,3 +143,63 @@ if [ -f $AKHOME/modules/dlkm.tar.xz ]; then
     flash_generic vendor_dlkm;
 fi
 ## end vendor_dlkm install
+
+## system_dlkm install
+if [ -f $AKHOME/modules/sdlkm.tar.xz ]; then
+    # reset for system_dlkm patching
+    reset_ak;
+
+    ui_print " " "/dev/block/mapper/system_dlkm${SLOT}"
+    ui_print " " "- [✓] XZ tarball found. Starting /system_dlkm modules update..."
+
+    ui_print "- [•] Pulling /system_dlkm image from current slot (${SLOT})..."
+    dd if=/dev/block/mapper/system_dlkm${SLOT} of=${AKHOME}/system_dlkm.img || \
+        abort "[✗] Failed to pull system_dlkm${SLOT}.img"
+    extract_system_dlkm_dir=${AKHOME}/_extract_system_dlkm
+    mkdir -p $extract_system_dlkm_dir || \
+        abort "[✗] Failed to create $extract_system_dlkm_dir"
+
+    ui_print "- [•] Unpacking /system_dlkm image..."
+    ${BIN}/extract.erofs -i ${AKHOME}/system_dlkm.img -x -T8 -o ${extract_system_dlkm_dir} &> /dev/null || \
+        abort "[✗] Failed to unpack the system_dlkm image"
+    sync
+
+    ui_print "- [•] Updating /system_dlkm modules..."
+    extract_system_dlkm_modules_dir=${extract_system_dlkm_dir}/system_dlkm/lib/modules
+    rm -f ${extract_system_dlkm_modules_dir}/* || \
+        abort "[✗] Failed to remove pre-existing files in ${extract_system_dlkm_modules_dir}"
+    rm -f ${extract_system_dlkm_dir}/config/system_dlkm_{fs_config,file_contexts} || \
+        abort "[✗] Failed to remove pre-existing fs_config and file_contexts in ${extract_system_dlkm_dir}/config"
+    busybox tar -xpf ${AKHOME}/modules/sdlkm.tar.xz -C ${extract_system_dlkm_dir}/system_dlkm/ || \
+        abort "[✗] Failed to extract XZ-compressed tarball"
+    mv ${AKHOME}/config/system_dlkm* ${extract_system_dlkm_dir}/config/ || \
+        abort "[✗] Failed to move fs_config and file_contexts to ${extract_system_dlkm_dir}/config"
+
+    ui_print "- [•] Repacking /system_dlkm image..."
+    rm -f ${AKHOME}/system_dlkm.img || \
+        abort "[✗] Failed to remove pre-existing system_dlkm.img"
+    ${BIN}/mkfs.erofs \
+          --mount-point /system_dlkm \
+          --fs-config-file ${extract_system_dlkm_dir}/config/system_dlkm_fs_config \
+          --file-contexts ${extract_system_dlkm_dir}/config/system_dlkm_file_contexts \
+          -z lz4 \
+          -b 4096 \
+          -C 262144 \
+          -T 1230768000 \
+          ${AKHOME}/system_dlkm.img ${extract_system_dlkm_dir}/system_dlkm || \
+        abort "[✗] Failed to repack the system_dlkm image"
+    rm -rf ${extract_system_dlkm_dir} || \
+        abort "[✗] Failed to remove working directory"
+    unset extract_system_dlkm_dir extract_system_dlkm_modules_dir
+
+    system_dlkm_block_size=$(blockdev --getsize64 /dev/block/mapper/system_dlkm${SLOT})
+    if [ $(wc -c < $AKHOME/system_dlkm.img) -lt ${system_dlkm_block_size} ]; then
+        ui_print "- [•] Generated /system_dlkm image size is smaller than the block device..."
+        ui_print "- [•] Truncating to fill the erofs image file..."
+        truncate -c -s $system_dlkm_block_size $AKHOME/system_dlkm.img
+    fi
+
+    ui_print "- [✓] Flashing new /system_dlkm image..."
+    flash_generic system_dlkm;
+fi
+## end system_dlkm install
