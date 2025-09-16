@@ -58,12 +58,6 @@ if [ -f $AKHOME/modules/dlkm.cpio.lz4 ]; then
     magiskboot decompress $AKHOME/modules/dlkm.cpio.lz4 $AKHOME/dlkm.cpio || \
         abort "[✗] Failed to decompress LZ4 CPIO archive"
 
-    magiskboot cpio $AKHOME/dlkm.cpio test
-    cpio_check=$?
-    if [ $cpio_check -eq 1 ]; then
-        abort "[✗] Decompressed CPIO archive error"
-    fi
-
     ui_print "- [•] Updating vendor_ramdisk modules..."
     mv $AKHOME/dlkm.cpio $SPLITIMG/vendor_ramdisk/dlkm.cpio || \
         abort "[✗] Updating vendor_ramdisk modules failed"
