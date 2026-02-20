@@ -13,8 +13,7 @@ do.cleanup=1
 do.cleanuponabort=0
 device.name1=cancunf
 supported.versions=16
-supported.patchlevels=
-supported.vendorpatchlevels=
+supported.vendorpatchlevels=2026-01 -
 '; } # end properties
 
 
