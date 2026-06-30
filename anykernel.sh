@@ -12,8 +12,8 @@ do.systemless=0
 do.cleanup=1
 do.cleanuponabort=0
 device.name1=cancunf
-supported.versions=16
-supported.vendorpatchlevels=2026-01 -
+supported.versions=17
+supported.vendorpatchlevels=
 '; } # end properties
 
 
