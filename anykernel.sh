@@ -197,3 +197,5 @@ if [ -f $AKHOME/modules/sdlkm.tar.xz ]; then
     flash_generic system_dlkm;
 fi
 ## end system_dlkm install
+
+flash_generic dtbo;
