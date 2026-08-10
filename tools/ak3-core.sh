@@ -637,7 +637,7 @@ flash_generic() {
   fi;
 }
 
-### write_boot (repack ramdisk then build, sign and write image, vendor_dlkm and dtbo)
+### write_boot (repack ramdisk then build, sign and write image, vendor_dlkm, system_dlkm and dtbo)
 write_boot() {
   repack_ramdisk;
   flash_boot;
@@ -781,7 +781,7 @@ replace_file() {
   chmod $2 $1;
 }
 
-# patch_fstab <fstab file> <mount match name> <fs match type> block|mount|fstype|options|flags <original string> <replacement string>
+# patch_fstab <fstab file> <mount match name> <fs match type> <block|mount|fstype|options|flags> <original string> <replacement string>
 patch_fstab() {
   local entry part newpart newentry;
   entry=$(grep "$2[[:space:]]" $1 | grep "$3");
