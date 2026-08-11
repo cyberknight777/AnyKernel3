@@ -53,25 +53,29 @@ split_boot; # use split_boot to skip ramdisk unpack, e.g. for dtb on devices wit
 if [ -f $AKHOME/modules/dlkm.cpio.lz4 ]; then
     ui_print " " "- [✓] LZ4 CPIO archive found. Starting vendor_ramdisk modules update..."
 
-    ui_print "- [•] Decompressing the archive..."
-    magiskboot decompress $AKHOME/modules/dlkm.cpio.lz4 $AKHOME/dlkm.cpio || \
-        abort "[✗] Failed to decompress LZ4 CPIO archive"
-
     ui_print "- [•] Updating vendor_ramdisk modules..."
-    mv $AKHOME/dlkm.cpio $SPLITIMG/vendor_ramdisk/dlkm.cpio || \
+    mv $AKHOME/modules/dlkm.cpio.lz4 $AKHOME/dlkm-new.cpio || \
         abort "[✗] Updating vendor_ramdisk modules failed"
 fi
 
 if [ -f $AKHOME/config/modules.load.recovery ]; then
     ui_print " " "- [✓] Recovery modules.load found. Starting vendor_ramdisk recovery modules.load update..."
 
-    ui_print "- [•] Checking for modules.load.recovery in platform (default) ramdisk.cpio..."
-    magiskboot cpio $SPLITIMG/vendor_ramdisk/ramdisk.cpio "exists lib/modules/modules.load.recovery" || \
-        abort "[✗] Checking for modules.load.recovery in platform (default) ramdisk.cpio failed"
+    ui_print "- [•] Unpacking platform (default) ramdisk.cpio..."
+    unpack_vendorrd platform || \
+        abort "[✗] Unpacking platform (default) ramdisk.cpio failed"
 
-    ui_print "- [•] Updating platform (default) ramdisk.cpio..."
-    magiskboot cpio $SPLITIMG/vendor_ramdisk/ramdisk.cpio "add 0644 lib/modules/modules.load.recovery $AKHOME/config/modules.load.recovery" || \
-        abort "[✗] Updating platform (default) ramdisk.cpio failed"
+    ui_print "- [•] Checking for recovery modules.load in platform (default) ramdisk.cpio..."
+    [ -f $VENDORRD/ramdisk/lib/modules/modules.load.recovery ] || \
+        abort "[✗] Checking for recovery modules.load in platform (default) ramdisk.cpio failed"
+
+    ui_print "- [•] Updating recovery modules.load in platform (default) ramdisk.cpio..."
+    mv $AKHOME/config/modules.load.recovery $VENDORRD/ramdisk/lib/modules/modules.load.recovery || \
+        abort "[✗] Updating recovery modules.load in platform (default) ramdisk.cpio failed"
+
+    ui_print "- [•] Repacking platform (default) ramdisk.cpio..."
+    repack_ramdisk || \
+        abort "[✗] Repacking platform (default) ramdisk.cpio failed"
 fi
 
 ui_print "- [✓] Flashing new vendor_boot image..."
