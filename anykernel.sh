@@ -78,7 +78,7 @@ if [ -f $AKHOME/config/modules.load.recovery ]; then
         abort "[✗] Repacking platform (default) ramdisk.cpio failed"
 fi
 
-ui_print "- [✓] Flashing new vendor_boot image..."
+ui_print " " "- [✓] Flashing new vendor_boot image..."
 flash_boot; # use flash_boot to skip ramdisk repack, e.g. for dtb on devices with hdr v4 but no vendor_kernel_boot
 ## end vendor_boot install
 
@@ -137,7 +137,7 @@ if [ -f $AKHOME/modules/dlkm.tar.xz ]; then
         truncate -c -s $vendor_dlkm_block_size $AKHOME/vendor_dlkm.img
     fi
 
-    ui_print "- [✓] Flashing new /vendor_dlkm image..."
+    ui_print " " "- [✓] Flashing new /vendor_dlkm image..."
     flash_generic vendor_dlkm;
 fi
 ## end vendor_dlkm install
@@ -197,9 +197,10 @@ if [ -f $AKHOME/modules/sdlkm.tar.xz ]; then
         truncate -c -s $system_dlkm_block_size $AKHOME/system_dlkm.img
     fi
 
-    ui_print "- [✓] Flashing new /system_dlkm image..."
+    ui_print " " "- [✓] Flashing new /system_dlkm image..."
     flash_generic system_dlkm;
 fi
 ## end system_dlkm install
 
+ui_print " " "- [✓] Flashing new dtbo image..."
 flash_generic dtbo;
